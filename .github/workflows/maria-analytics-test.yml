@@ -1,0 +1,100 @@
+name: Maria - Cloudflare Analytics Test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-analytics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Test read-only Cloudflare Web Analytics access
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          python3 - <<'PY'
+          import datetime as dt
+          import json
+          import os
+          import sys
+          import urllib.error
+          import urllib.request
+          from zoneinfo import ZoneInfo
+
+          token = os.environ.get("CF_TOKEN", "")
+          account = os.environ.get("CF_ACCOUNT", "")
+          if not token or not account:
+              sys.exit("Missing CLOUDFLARE_API_TOKEN secret or CLOUDFLARE_ACCOUNT_ID variable.")
+
+          tz = ZoneInfo("America/Santo_Domingo")
+          today = dt.datetime.now(tz).date()
+          yesterday = today - dt.timedelta(days=1)
+          start = dt.datetime.combine(yesterday, dt.time.min, tzinfo=tz)
+          end = start + dt.timedelta(days=1)
+          utc = dt.timezone.utc
+          fmt = lambda d: d.astimezone(utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+          print(f"Reporting date (Dominican Republic): {yesterday}", flush=True)
+          print(f"UTC query window: {fmt(start)} to {fmt(end)}", flush=True)
+
+          query = """
+          query MariaAnalytics($account: string, $start: Time, $end: Time) {
+            viewer {
+              accounts(filter: { accountTag: $account }) {
+                rumPageloadEventsAdaptiveGroups(
+                  limit: 100
+                  filter: { datetime_geq: $start, datetime_lt: $end }
+                ) {
+                  count
+                  sum { visits }
+                  dimensions { requestHost }
+                }
+              }
+            }
+          }
+          """
+          payload = json.dumps({
+              "query": query,
+              "variables": {"account": account, "start": fmt(start), "end": fmt(end)}
+          }).encode("utf-8")
+          req = urllib.request.Request(
+              "https://api.cloudflare.com/client/v4/graphql",
+              data=payload,
+              headers={"Authorization": "Bearer " + token, "Content-Type": "application/json"},
+              method="POST",
+          )
+          try:
+              with urllib.request.urlopen(req, timeout=30) as response:
+                  result = json.load(response)
+          except urllib.error.HTTPError as error:
+              print(f"Cloudflare HTTP error: {error.code}", flush=True)
+              sys.exit(1)
+          except Exception as error:
+              print(f"Cloudflare connection failed: {type(error).__name__}", flush=True)
+              sys.exit(1)
+
+          if result.get("errors"):
+              for error in result["errors"]:
+                  print("GraphQL error:", error.get("message", "unknown"), flush=True)
+              sys.exit(1)
+          accounts = ((result.get("data") or {}).get("viewer") or {}).get("accounts") or []
+          if len(accounts) != 1:
+              sys.exit(f"Expected one Cloudflare account, got {len(accounts)}.")
+          groups = accounts[0].get("rumPageloadEventsAdaptiveGroups") or []
+          host = "by-maria-beauty-store.pages.dev"
+          matched = [g for g in groups if (g.get("dimensions") or {}).get("requestHost") == host]
+          if len(groups) >= 100:
+              sys.exit("Query group limit reached; cannot trust totals.")
+          views = sum(g.get("count") or 0 for g in matched)
+          visits = sum((g.get("sum") or {}).get("visits") or 0 for g in matched)
+          print(f"Cloudflare query succeeded. Returned host groups: {len(groups)}", flush=True)
+          print(f"Matching website: {host}; groups: {len(matched)}", flush=True)
+          print(f"Yesterday's page views: {views}", flush=True)
+          print(f"Yesterday's visits: {visits}", flush=True)
+          if not matched:
+              print("WARNING: No matching hostname in results; zero is not yet validated.", flush=True)
+          print("READ-ONLY TEST COMPLETE. No email sent.", flush=True)
+          PY
