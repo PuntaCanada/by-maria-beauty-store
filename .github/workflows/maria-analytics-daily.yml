@@ -1,0 +1,123 @@
+name: Maria - Daily Analytics Email
+
+on:
+  schedule:
+    - cron: '0 12 * * *' # 08:00 America/Santo_Domingo (UTC-4 year-round)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  send-daily:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Fetch yesterday's stats and send daily email
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CF_ACCOUNT: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          BREVO_KEY: ${{ secrets.BREVO_API_KEY }}
+        run: |
+          python3 - <<'PY'
+          import datetime as dt
+          import html
+          import json
+          import os
+          import sys
+          import urllib.error
+          import urllib.request
+          from zoneinfo import ZoneInfo
+
+          token = os.environ.get("CF_TOKEN")
+          account = os.environ.get("CF_ACCOUNT")
+          brevo_key = os.environ.get("BREVO_KEY")
+          if not all((token, account, brevo_key)):
+              sys.exit("Missing a required GitHub secret or variable.")
+
+          tz = ZoneInfo("America/Santo_Domingo")
+          yesterday = dt.datetime.now(tz).date() - dt.timedelta(days=1)
+          start = dt.datetime.combine(yesterday, dt.time.min, tzinfo=tz)
+          end = start + dt.timedelta(days=1)
+          fmt = lambda d: d.astimezone(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+          print(f"Reporting date in Dominican Republic: {yesterday}", flush=True)
+
+          query = """
+          query MariaAnalytics($account: string, $start: Time, $end: Time) {
+            viewer {
+              accounts(filter: { accountTag: $account }) {
+                rumPageloadEventsAdaptiveGroups(
+                  limit: 100
+                  filter: { datetime_geq: $start, datetime_lt: $end }
+                ) {
+                  count
+                  sum { visits }
+                  dimensions { requestHost }
+                }
+              }
+            }
+          }
+          """
+          def post_json(url, payload, headers):
+              req = urllib.request.Request(
+                  url,
+                  data=json.dumps(payload).encode("utf-8"),
+                  headers={"Content-Type": "application/json", **headers},
+                  method="POST",
+              )
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as response:
+                      return json.load(response)
+              except urllib.error.HTTPError as error:
+                  print(f"Request failed ({url.split('/')[2]}): HTTP {error.code}", flush=True)
+                  sys.exit(1)
+
+          result = post_json(
+              "https://api.cloudflare.com/client/v4/graphql",
+              {"query": query, "variables": {"account": account, "start": fmt(start), "end": fmt(end)}},
+              {"Authorization": f"Bearer {token}"},
+          )
+          if result.get("errors"):
+              for error in result["errors"]:
+                  print("Cloudflare GraphQL error:", error.get("message", "unknown"), flush=True)
+              sys.exit(1)
+          accounts = ((result.get("data") or {}).get("viewer") or {}).get("accounts") or []
+          if len(accounts) != 1:
+              sys.exit("Unexpected Cloudflare account response.")
+          groups = accounts[0].get("rumPageloadEventsAdaptiveGroups") or []
+          if len(groups) >= 100:
+              sys.exit("Cloudflare result may be truncated; email not sent.")
+          hostname = "by-maria-beauty-store.pages.dev"
+          matching = [g for g in groups if (g.get("dimensions") or {}).get("requestHost") == hostname]
+          if groups and not matching:
+              sys.exit("Unexpected Cloudflare hostname; email not sent.")
+          views = sum(g.get("count") or 0 for g in matching)
+          visits = sum((g.get("sum") or {}).get("visits") or 0 for g in matching)
+          print(f"Analytics retrieved: visits={visits}, page_views={views}", flush=True)
+
+          date_label = yesterday.strftime("%d/%m/%Y")
+          subject = f"Tu resumen diario de visitas - {date_label}"
+          body = (
+              f"¡Hola, María! ❤️\n\n"
+              f"Aquí tienes las estadísticas de tu página web de ayer.\n\n"
+              f"Fecha: {date_label}\n"
+              f"Visitas: {visits}\n"
+              f"Vistas de página: {views}\n\n"
+              f"Página: https://{hostname}/\n\n"
+              f"Con cariño,\nTu resumen de By María Beauty & Store"
+          )
+          response = post_json(
+              "https://api.brevo.com/v3/smtp/email",
+              {
+                  "sender": {"name": "PuntaCanada", "email": "marc.rosemann1@gmail.com"},
+                  "to": [{"email": "lacandynocents@gmail.com", "name": "María"}],
+                  "subject": subject,
+                  "textContent": body,
+              },
+              {"api-key": brevo_key},
+          )
+          if not response.get("messageId"):
+              sys.exit("Brevo did not return a messageId; verify delivery in Brevo.")
+          print("Brevo accepted the daily email. Recipient: lacandynocents@gmail.com", flush=True)
+          print("Check Brevo transactional email logs for delivery status.", flush=True)
+          PY
