@@ -42,6 +42,29 @@
     @media(max-width:700px){.nav{padding-top:9px;padding-bottom:9px}.nav-links{justify-content:center}.lang-button{padding:6px 7px;font-size:11px}.language-switch{margin-left:auto}}
     @media(max-width:365px){.lang-button{padding:5px 4px;gap:4px;font-size:10px}.lang-flag{width:22px}}
   
+
+  /* Compact mobile navigation: full-size touch targets, no hidden horizontal overflow */
+  @media(max-width:700px){
+    .nav{column-gap:8px;row-gap:8px}
+    .brand{flex:1 1 auto}
+    .language-switch{flex:0 0 auto}
+    .nav-links{order:3;flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+    .nav-links .trenzas-link,.nav-links .nav-action{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 16px;border-radius:22px}
+    .nav-links .trenzas-link{background:#fff4f2}
+    .lang-button{min-height:44px}
+    .hero .button,.cta .button{min-height:48px}
+    .eyebrow{letter-spacing:2px}
+    .faq-list summary{min-height:52px}
+    .hero-note,.gallery-help,.service-footer{font-size:14px}
+  }
+  @media(max-width:380px){
+    .brand strong{font-size:17px}.brand small{letter-spacing:1.5px}
+    .language-switch{gap:1px;padding:2px}
+    .lang-button{min-height:44px;gap:3px;padding:6px 4px}
+    .lang-flag{width:20px;height:14px}
+    .nav-links .trenzas-link,.nav-links .nav-action{flex:1 1 105px}
+  }
+
   /* Dauerhaft sichtbarer, kompakter WhatsApp-Kontaktbutton */
   .floating-whatsapp{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));z-index:1000;display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;background:#168547;color:#fff;text-decoration:none;box-shadow:0 8px 24px rgba(0,0,0,.23);border:2px solid #fff;transition:transform .18s ease,box-shadow .18s ease}
   .floating-whatsapp svg{width:29px;height:29px;fill:currentColor}

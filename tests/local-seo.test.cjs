@@ -42,3 +42,14 @@ test('FAQ offers local booking guidance and clearly distinguishes braiding pract
  assert.match(home, /\.faq-list summary:focus-visible/);
  for(const phrase of ['Frequently asked questions','How much does it cost, and how do I book?','Explore braids ♡'])assert.ok(dictionary.includes(phrase));
 });
+
+test('small-screen navigation keeps the Spanish and English switches and the critical links touch-friendly',()=>{
+ assert.match(home,/\.nav-links \.trenzas-link,\.nav-links \.nav-action\{display:inline-flex/);
+ assert.match(home,/\.lang-button\{min-height:44px\}/);
+ assert.match(home,/@media\(max-width:380px\)/);
+ assert.match(home,/\.nav-links \.trenzas-link,\.nav-links \.nav-action\{flex:1 1 105px\}/);
+ assert.match(braids,/#cita\{scroll-margin-top:16px\}/);
+ assert.match(braids,/\.field input,\.field select\{font-size:16px;min-height:48px\}/);
+ assert.match(braids,/\.footer\{padding-bottom:78px\}/);
+ assert.match(braids,/prefers-reduced-motion:reduce/);
+});
