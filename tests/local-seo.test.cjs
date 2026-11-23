@@ -53,3 +53,19 @@ test('small-screen navigation keeps the Spanish and English switches and the cri
  assert.match(braids,/\.footer\{padding-bottom:78px\}/);
  assert.match(braids,/prefers-reduced-motion:reduce/);
 });
+
+test('makeup request is accessible, locally handled and bilingual without saving data',()=>{
+  assert.match(home, /id="makeup-request"/);
+  assert.match(home, /id="makeup-name"[^>]*maxlength="70"/);
+  assert.match(home, /id="makeup-occasion" required/);
+  assert.match(home, /id="makeup-date" type="date"/);
+  assert.match(home, /makeupForm\.addEventListener\('submit',event=>/);
+  assert.match(home, /event\.preventDefault\(\)/);
+  assert.match(home, /document\.documentElement\.lang==='en'/);
+  assert.match(home, /encodeURIComponent\(message\)/);
+  assert.match(home, /window\.open\('https:\/\/wa\.me\/'\+whatsappNumber/);
+  assert.match(home, /font-size:16px/);
+  assert.match(home, /Los datos solo se usan para preparar el mensaje de WhatsApp y no se guardan aquí/);
+  for(const phrase of ['Your name (optional)', "What's the occasion?",'Preferred date (optional)','Prepare WhatsApp inquiry ♡','This does not confirm an appointment'])assert.ok(dictionary.includes(phrase),phrase);
+  new vm.Script(home.match(/<script>([\s\S]*?)<\/script>/g).at(-1).replace(/^<script>|<\/script>$/g,''));
+});
