@@ -5,8 +5,12 @@ on:
     paths:
       - 'index.html'
       - 'i18n.js'
+      - 'trenzas.html'
+      - 'sitemap.xml'
       - 'tests/**'
       - '.github/workflows/site-checks.yml'
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
