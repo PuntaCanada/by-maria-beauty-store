@@ -9,7 +9,7 @@ test('home retains its makeup navigation and links gently to braids',()=>{
  assert.match(home,/href="trenzas\.html" class="trenzas-link"/);
  assert.match(home,/\.nav-links a:not\(\.nav-action\):not\(\.trenzas-link\)/);
 });
-test('braids has bilingual content, safe direct WhatsApp request, and only Maria's supplied flyers',()=>{
+test('braids has bilingual content, safe direct WhatsApp request, and only the supplied original flyers',()=>{
  assert.match(braids,/<html lang="es">/);
  assert.match(braids,/data-es="Trenzas clásicas" data-en="Classic braids"/);
  assert.match(braids,/id="booking"/);
