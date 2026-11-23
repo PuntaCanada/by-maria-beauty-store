@@ -32,3 +32,13 @@ test('English translations exist and JS remains parseable', () => {
     assert.ok(dictionary.includes(phrase), phrase);
   }
 });
+
+test('FAQ offers local booking guidance and clearly distinguishes braiding practice',()=>{
+ assert.match(home, /id="preguntas" class="section faq"/);
+ assert.equal((home.match(/<details>/g)||[]).length, 3);
+ assert.match(home, /Los precios y la disponibilidad se consultan directamente por WhatsApp/);
+ assert.match(home, /Estoy practicando estilos de trenzas sin una tarifa fija/);
+ assert.match(home, /class="faq-link" href="trenzas.html"/);
+ assert.match(home, /\.faq-list summary:focus-visible/);
+ for(const phrase of ['Frequently asked questions','How much does it cost, and how do I book?','Explore braids ♡'])assert.ok(dictionary.includes(phrase));
+});
