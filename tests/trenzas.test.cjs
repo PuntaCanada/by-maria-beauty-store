@@ -28,3 +28,16 @@ test('braids page is discoverable without modifying homepage canonical',()=>{
  assert.match(sitemap,/https:\/\/by-maria-beauty-store\.pages\.dev\/trenzas\.html/);
  assert.match(home,/rel="canonical" href="https:\/\/by-maria-beauty-store\.pages\.dev\/"/);
 });
+
+test('braids offers an always-visible, accessible and bilingual WhatsApp shortcut independent of booking',()=>{
+ assert.match(braids,/class="floating-whatsapp" id="floating-whatsapp-trenzas"/);
+ assert.match(braids,/\.floating-whatsapp\{position:fixed;/);
+ assert.match(braids,/env\(safe-area-inset-bottom\)/);
+ assert.match(braids,/\.floating-whatsapp:focus-visible/);
+ assert.match(braids,/prefers-reduced-motion:reduce/);
+ assert.match(braids,/data-umami-event="whatsapp-trenzas-fijo"/);
+ assert.match(braids,/function updateFloatingWhatsApp\(\)/);
+ assert.match(braids,/floatingWhatsApp\.href='https:\/\/wa\.me\/'\+WA\+'\?text='\+encodeURIComponent\(message\)/);
+ assert.match(braids,/updateFloatingWhatsApp\(\);/);
+ assert.match(braids,/Ask María about braids on WhatsApp/);
+});
