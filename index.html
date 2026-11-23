@@ -29,6 +29,19 @@
     .section{padding:88px 0}.section-title{text-align:center;margin-bottom:39px}.section-title .eyebrow{margin-bottom:6px}.section-title h2{font:500 clamp(34px,4vw,47px)/1.2 'Playfair Display',Georgia,serif;color:#67383c;margin:0}.rule{display:block;width:62px;height:2px;background:var(--gold);margin:18px auto 0}.about{background:#fff}.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}.about-art{min-height:270px;border-radius:24px;background:linear-gradient(135deg,#fbebe7,#f7d7d8);display:grid;place-items:center;text-align:center;padding:36px;position:relative;overflow:hidden}.about-art:before,.about-art:after{content:'✦';position:absolute;font-size:80px;color:rgba(177,104,113,.19)}.about-art:before{left:20px;top:-18px}.about-art:after{right:19px;bottom:-20px}.about-art .icon{font-size:54px;color:#b97c78;font-family:Georgia,serif;line-height:1}.about-art p{font:italic 28px/1.35 'Playfair Display',Georgia,serif;color:#884f55;max-width:350px;margin:12px 0 0}.about-copy .eyebrow{margin-bottom:8px}.about-copy h2{font:500 42px 'Playfair Display',Georgia,serif;margin:0 0 17px;color:#67383c}.about-copy p{color:#725e5b;line-height:1.9;max-width:520px}.about-copy .signature{font:italic 27px 'Playfair Display',Georgia,serif;color:var(--rose);margin:17px 0 0}
     .services{background:#fdf4f2}.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:21px}.service-card{background:#fff;border:1px solid #f2e3e0;border-radius:22px;padding:33px 25px 35px;text-align:center;box-shadow:0 6px 30px rgba(97,53,49,.035)}.service-icon{height:70px;width:70px;display:grid;place-items:center;background:#fbece9;border-radius:50%;font-size:29px;margin:0 auto 20px}.service-card h3{font:600 24px/1.3 'Playfair Display',Georgia,serif;color:#6d3c40;margin:0 0 12px}.service-card p{margin:0;color:var(--muted);font-size:14px}.service-footer{text-align:center;color:#8e7370;font-size:13px;margin-top:26px}
     .gallery{background:#fff}.gallery-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.gallery-placeholder{min-height:235px;border:1px solid #edd9d6;border-radius:19px;background:linear-gradient(135deg,#fdf5f2,#f6e5e4);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;color:#ad8c89}.gallery-placeholder svg{width:42px;height:42px;stroke:#b68b86}.gallery-placeholder span{font-size:13px;letter-spacing:1px}.gallery-help{text-align:center;color:#8d7773;margin:26px auto 0;max-width:640px;font-size:14px}
+
+    /* Consulta rápida: no registra ni envía datos a servidores del sitio */
+    .makeup-request{max-width:730px;margin:0 auto 20px;padding:28px;background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);text-align:left}
+    .makeup-request-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    .makeup-field{display:flex;flex-direction:column;gap:7px;margin-bottom:18px}
+    .makeup-field label{color:var(--berry);font-weight:700;font-size:14px}
+    .makeup-field input,.makeup-field select{width:100%;min-height:48px;padding:10px 13px;border:1px solid #d9c4c0;border-radius:12px;background:#fff;color:var(--ink);font:inherit;font-size:16px}
+    .makeup-field input:focus-visible,.makeup-field select:focus-visible{outline:3px solid #b1773b;outline-offset:2px}
+    .makeup-request .makeup-send{width:100%;min-height:48px;cursor:pointer}
+    .makeup-request .makeup-disclaimer{max-width:none;margin:15px 0 0;font-size:13px;line-height:1.6;text-align:left}
+    .cta .makeup-direct-note{margin:0 auto 10px;font-size:14px}
+    @media(max-width:700px){.makeup-request{padding:20px}.makeup-request-grid{grid-template-columns:1fr;gap:0}}
+    @media(max-width:380px){.makeup-request{padding:16px}}
     .faq{background:#fff}.faq-list{max-width:780px;margin:auto;display:grid;gap:12px}.faq-list details{border:1px solid var(--line);border-radius:18px;background:#fffcfa;padding:0 20px}.faq-list summary{cursor:pointer;list-style:none;padding:18px 32px 18px 0;position:relative;font-weight:700;color:var(--berry)}.faq-list summary::-webkit-details-marker{display:none}.faq-list summary:after{content:'+';position:absolute;right:0;font-size:22px;top:14px;color:var(--rose)}.faq-list details[open] summary:after{content:'−'}.faq-list details p{color:var(--muted);margin:0 0 16px;line-height:1.7}.faq-link{display:inline-block;font-weight:700;color:var(--berry);text-decoration:underline;margin:0 0 19px}.faq-list summary:focus-visible,.faq-link:focus-visible{outline:3px solid #b1773b;outline-offset:4px}
     .cta{background:linear-gradient(125deg,#f6e0e0,#fff8f4 55%,#f7e2df);text-align:center;padding:83px 0 91px}.cta h2{font:500 clamp(37px,4vw,49px) 'Playfair Display',Georgia,serif;margin:0 0 10px;color:#713d41}.cta p{font-size:15px;color:#816763;margin:0 auto 26px;max-width:580px}.cta .eyebrow{margin-bottom:12px}.footer{padding:35px 0;background:#fff}.footer-inner{display:flex;justify-content:space-between;gap:20px;align-items:center}.footer strong{font:600 19px 'Playfair Display',Georgia,serif;color:#713d41}.footer p{font-size:12px;color:#927d78;margin:4px 0}.footer a{font-size:13px;color:#9b6064;font-weight:700}.footer a:hover{text-decoration:underline}
     @media(max-width:900px){.hero-grid{gap:20px}.hero h1{font-size:53px}.float-tag{right:0}.portrait-border{height:450px}.about-grid{gap:34px}}@media(max-width:700px){.wrap{width:min(100% - 34px,550px)}.nav{min-height:70px}.brand strong{font-size:18px}.brand small{font-size:8px;letter-spacing:2px}.brand-mark{width:37px;height:37px;font-size:23px}.nav-links{gap:12px}.nav-links a:not(.nav-action):not(.trenzas-link){display:none}.nav-action{padding:10px 13px;font-size:12px}.hero-grid{grid-template-columns:1fr;gap:0}.hero-copy{text-align:center;padding:62px 0 29px}.hero h1{font-size:clamp(40px,10vw,55px);letter-spacing:-1.6px;margin-bottom:20px}.hero p.intro{font-size:15px;margin-left:auto;margin-right:auto}.hero-note{font-size:11px}.hero-visual{padding-top:15px}.portrait-border{height:min(105vw,440px);width:min(80vw,380px)}.float-tag{right:0;bottom:22px;font-size:14px}.section{padding:65px 0}.section-title{margin-bottom:29px}.about-grid{grid-template-columns:1fr;gap:29px}.about-art{min-height:210px}.about-art p{font-size:24px}.about-copy h2{font-size:36px}.services-grid,.gallery-grid{grid-template-columns:1fr;gap:14px}.service-card{padding:26px 25px}.gallery-grid{grid-template-columns:repeat(3,1fr);gap:9px}.gallery-placeholder{min-height:118px;border-radius:12px}.gallery-placeholder svg{width:29px;height:29px}.gallery-placeholder span{font-size:10px}.cta{padding:65px 0}.footer-inner{display:block;text-align:center}.footer .right{margin-top:15px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.button{transition:none}}
@@ -156,6 +169,31 @@
 
     <section id="contacto" class="cta">
       <div class="wrap"><span class="eyebrow">Tu próximo look empieza aquí</span><h2>¿Lista para brillar?</h2><p>Si estás en Higüey o sus alrededores, escríbeme para consultar precios, disponibilidad y detalles de tu maquillaje. ¡Será un placer atenderte!</p>
+        <form id="makeup-request" class="makeup-request" aria-label="Consulta de maquillaje por WhatsApp">
+          <div class="makeup-request-grid">
+            <div class="makeup-field">
+              <label for="makeup-name">Tu nombre (opcional)</label>
+              <input id="makeup-name" type="text" autocomplete="name" maxlength="70" placeholder="" />
+            </div>
+            <div class="makeup-field">
+              <label for="makeup-occasion">¿Para qué ocasión?</label>
+              <select id="makeup-occasion" required>
+                <option value="">Selecciona una opción</option>
+                <option value="social">Salida especial</option>
+                <option value="birthday">Cumpleaños</option>
+                <option value="event">Evento</option>
+                <option value="other">Otra ocasión</option>
+              </select>
+            </div>
+          </div>
+          <div class="makeup-field">
+            <label for="makeup-date">Fecha preferida (opcional)</label>
+            <input id="makeup-date" type="date" />
+          </div>
+          <button class="button whatsapp makeup-send" data-umami-event="whatsapp-maquillaje-formulario" type="submit">Preparar consulta por WhatsApp ♡</button>
+          <p class="makeup-disclaimer">Esto no confirma una cita. María te responderá personalmente según su disponibilidad. Los datos solo se usan para preparar el mensaje de WhatsApp y no se guardan aquí.</p>
+        </form>
+        <p class="makeup-direct-note">¿Prefieres escribirle directamente?</p>
         <a class="button whatsapp" data-whatsapp data-umami-event="whatsapp-kontakt" href="https://wa.me/18293249535" target="_blank" rel="noopener noreferrer" aria-label="Escribir a María por WhatsApp (abre WhatsApp)">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 3.5A11.4 11.4 0 0 0 12.3 0C6 0 .8 5.1.8 11.4c0 2 .5 4 1.6 5.7L0 24l7.1-2.3a11.4 11.4 0 0 0 5.2 1.2C18.6 22.9 23.8 17.8 23.8 11.5c0-3.1-1.2-5.9-3.3-8ZM12.3 21a9.4 9.4 0 0 1-4.8-1.3l-.4-.2-4.2 1.4 1.4-4.1-.3-.4A9.4 9.4 0 0 1 2.6 11.4a9.7 9.7 0 0 1 9.7-9.6 9.7 9.7 0 0 1 0 19.3Zm5.3-7.2c-.3-.1-1.6-.8-1.9-.9-.2-.1-.4-.1-.6.2-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.4-2.3-1.5-.8-.8-1.4-1.7-1.6-2-.2-.3 0-.4.1-.6l.5-.5c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5L9.8 6.8c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.4-.2.3-.9 1-.9 2.3s.9 2.6 1 2.8c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.5 1.5.6.6.2 1.1.2 1.6.1.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.1.1-1.3 0 0-.2-.2-.5-.3Z"/></svg>
           Escríbeme por WhatsApp
@@ -175,6 +213,33 @@
     const whatsappMessage = '¡Hola, María! 💄 Me gustaría consultar los precios y la disponibilidad para un maquillaje.';
     const whatsappUrl = 'https://wa.me/' + whatsappNumber + '?text=' + encodeURIComponent(whatsappMessage);
     document.querySelectorAll('[data-whatsapp]').forEach(link => {link.href = whatsappUrl;});
+
+    // Kein Backend, keine lokale Speicherung: Werte nur auf Knopfdruck an WhatsApp übergeben.
+    const makeupForm = document.getElementById('makeup-request');
+    document.getElementById('makeup-date').min = (()=>{
+      const now=new Date();
+      const local=new Date(now.getTime()-now.getTimezoneOffset()*60000);
+      return local.toISOString().slice(0,10);
+    })();
+    makeupForm.addEventListener('submit',event=>{
+      event.preventDefault();
+      const english=document.documentElement.lang==='en';
+      const name=document.getElementById('makeup-name').value.trim().slice(0,70);
+      const occasion=document.getElementById('makeup-occasion').value;
+      const date=document.getElementById('makeup-date').value;
+      const descriptions={
+        social:['una salida especial','a special outing'],
+        birthday:['un cumpleaños','a birthday'],
+        event:['un evento','an event'],
+        other:['otra ocasión','another occasion']
+      };
+      if(!Object.prototype.hasOwnProperty.call(descriptions,occasion))return;
+      const description=descriptions[occasion][english?1:0];
+      const message=english
+        ?'Hello María! 💄 I would like to ask about makeup for '+description+'.'+(name?' My name is '+name+'.':'')+(date?' My preferred date is '+date+'.':'')+' Could you tell me your prices and availability?'
+        :'¡Hola, María! 💄 Me gustaría consultar un maquillaje para '+description+'.'+(name?' Me llamo '+name+'.':'')+(date?' Mi fecha preferida es '+date+'.':'')+' ¿Me puedes indicar precios y disponibilidad?';
+      window.open('https://wa.me/'+whatsappNumber+'?text='+encodeURIComponent(message),'_blank','noopener,noreferrer');
+    });
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
   <script src="/i18n.js" defer></script>
