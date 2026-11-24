@@ -18,7 +18,7 @@ test('Automatic browser locale, manual preference and WhatsApp language',()=>{
   const button=lang=>({lang,events:{},getAttribute(){return lang},setAttribute(k,v){this[k]=v},classList:{toggle(){}},addEventListener(ev,fn){this.events[ev]=fn}});
   const buttons=[button('es'),button('en')];
   const words=['Servicios de maquillaje','¿Lista para brillar?'].map(nodeValue=>({nodeValue,parentElement:{tagName:'H2',closest(){return null}}}));
-  const links=[{attrs:{},setAttribute(k,v){this.attrs[k]=v},href:''}];
+  const links=[{attrs:{},hasAttribute(){return false},setAttribute(k,v){this.attrs[k]=v},href:''}];
   const title={textContent:''};
   const doc={
    readyState:'complete',body:{},documentElement:{lang:'es'},
