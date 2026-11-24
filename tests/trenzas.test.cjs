@@ -6,7 +6,7 @@ const braids=fs.readFileSync('trenzas.html','utf8');
 const sitemap=fs.readFileSync('sitemap.xml','utf8');
 test('home retains its makeup navigation and links gently to braids',()=>{
  assert.match(home,/href="#servicios"/);
- assert.match(home,/href="trenzas\.html" class="trenzas-link"/);
+ assert.match(home,/href="\/trenzas" class="trenzas-link"/);
  assert.match(home,/\.nav-links a:not\(\.nav-action\):not\(\.trenzas-link\)/);
 });
 test('braids has bilingual content, safe direct WhatsApp request, and only the supplied original flyers',()=>{
@@ -25,14 +25,14 @@ test('braids has bilingual content, safe direct WhatsApp request, and only the s
  assert.equal((braids.match(/<img\b/g)||[]).length,3);
 });
 test('braids page is discoverable without modifying homepage canonical',()=>{
- assert.match(sitemap,/https:\/\/by-maria-beauty-store\.pages\.dev\/trenzas\.html/);
+ assert.match(sitemap,/https:\/\/by-maria-beauty-store\.pages\.dev\/trenzas<\/loc>/);
  assert.match(home,/rel="canonical" href="https:\/\/by-maria-beauty-store\.pages\.dev\/"/);
 });
 
 test('braids offers an always-visible, accessible and bilingual WhatsApp shortcut independent of booking',()=>{
  assert.match(braids,/class="floating-whatsapp" id="floating-whatsapp-trenzas"/);
  assert.match(braids,/\.floating-whatsapp\{position:fixed;/);
- assert.match(braids,/env\(safe-area-inset-bottom\)/);
+ assert.match(braids,/env\(safe-area-inset-bottom, 0px\)/);
  assert.match(braids,/\.floating-whatsapp:focus-visible/);
  assert.match(braids,/prefers-reduced-motion:reduce/);
  assert.match(braids,/data-umami-event="whatsapp-trenzas-fijo"/);
