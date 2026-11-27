@@ -4,17 +4,30 @@ on:
   schedule:
     - cron: '0 12 * * *' # 08:00 America/Santo_Domingo (UTC-4 year-round)
   workflow_dispatch:
+    inputs:
+      send:
+        description: 'Send yesterday report (otherwise read-only test)'
+        type: boolean
+        default: false
+  pull_request:
+    paths:
+      - '.github/workflows/maria-analytics-daily.yml'
 
 permissions:
   contents: read
 
 jobs:
   send-daily:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Fetch yesterday's stats and send daily email
         env:
+          GH_TOKEN: ${{ github.token }}
+          SEND_REPORT: ${{ github.event_name == 'schedule' || inputs.send == true }}
           CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CF_ACCOUNT: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           BREVO_KEY: ${{ secrets.BREVO_API_KEY }}
@@ -25,6 +38,7 @@ jobs:
           import json
           import os
           import sys
+          import time
           import urllib.error
           import urllib.request
           from zoneinfo import ZoneInfo
@@ -48,7 +62,7 @@ jobs:
               accounts(filter: { accountTag: $account }) {
                 rumPageloadEventsAdaptiveGroups(
                   limit: 100
-                  filter: { datetime_geq: $start, datetime_lt: $end }
+                  filter: { datetime_geq: $start, datetime_lt: $end, requestHost: "by-maria-beauty-store.pages.dev" }
                 ) {
                   count
                   sum { visits }
@@ -58,41 +72,51 @@ jobs:
             }
           }
           """
-          def post_json(url, payload, headers):
-              req = urllib.request.Request(
-                  url,
-                  data=json.dumps(payload).encode("utf-8"),
-                  headers={"Content-Type": "application/json", **headers},
-                  method="POST",
-              )
-              try:
-                  with urllib.request.urlopen(req, timeout=30) as response:
-                      return json.load(response)
-              except urllib.error.HTTPError as error:
-                  print(f"Request failed ({url.split('/')[2]}): HTTP {error.code}", flush=True)
-                  sys.exit(1)
+          def post_json(url, payload, headers, retry=False):
+              for attempt in range(3 if retry else 1):
+                  req = urllib.request.Request(
+                      url, data=json.dumps(payload).encode("utf-8"),
+                      headers={"Content-Type": "application/json", **headers}, method="POST",
+                  )
+                  try:
+                      with urllib.request.urlopen(req, timeout=30) as response:
+                          return json.load(response)
+                  except urllib.error.HTTPError as error:
+                      if not retry or error.code not in (408, 429, 500, 502, 503, 504) or attempt == 2:
+                          raise
+                  except (urllib.error.URLError, TimeoutError):
+                      if not retry or attempt == 2:
+                          raise
+                  time.sleep(2 ** (attempt + 1))
+
+          def parse_stats(result):
+              if result.get("errors"):
+                  raise ValueError("Cloudflare GraphQL error")
+              accounts = result["data"]["viewer"]["accounts"]
+              if len(accounts) != 1:
+                  raise ValueError("Unexpected Cloudflare account response")
+              groups = accounts[0]["rumPageloadEventsAdaptiveGroups"]
+              if not isinstance(groups, list) or len(groups) >= 100:
+                  raise ValueError("Invalid or truncated Cloudflare result")
+              views = visits = 0
+              for group in groups:
+                  if group["dimensions"]["requestHost"] != "by-maria-beauty-store.pages.dev":
+                      raise ValueError("Unexpected Cloudflare hostname")
+                  count, visit = group["count"], group["sum"]["visits"]
+                  if any(type(n) is not int or n < 0 for n in (count, visit)):
+                      raise ValueError("Invalid metrics")
+                  views += count
+                  visits += visit
+              return visits, views
 
           result = post_json(
               "https://api.cloudflare.com/client/v4/graphql",
               {"query": query, "variables": {"account": account, "start": fmt(start), "end": fmt(end)}},
               {"Authorization": f"Bearer {token}"},
+              retry=True,
           )
-          if result.get("errors"):
-              for error in result["errors"]:
-                  print("Cloudflare GraphQL error:", error.get("message", "unknown"), flush=True)
-              sys.exit(1)
-          accounts = ((result.get("data") or {}).get("viewer") or {}).get("accounts") or []
-          if len(accounts) != 1:
-              sys.exit("Unexpected Cloudflare account response.")
-          groups = accounts[0].get("rumPageloadEventsAdaptiveGroups") or []
-          if len(groups) >= 100:
-              sys.exit("Cloudflare result may be truncated; email not sent.")
           hostname = "by-maria-beauty-store.pages.dev"
-          matching = [g for g in groups if (g.get("dimensions") or {}).get("requestHost") == hostname]
-          if groups and not matching:
-              sys.exit("Unexpected Cloudflare hostname; email not sent.")
-          views = sum(g.get("count") or 0 for g in matching)
-          visits = sum((g.get("sum") or {}).get("visits") or 0 for g in matching)
+          visits, views = parse_stats(result)
           print(f"Analytics retrieved: visits={visits}, page_views={views}", flush=True)
 
           date_label = yesterday.strftime("%d/%m/%Y")
@@ -106,6 +130,21 @@ jobs:
               f"Página: https://{hostname}/\n\n"
               f"Con cariño,\nTu resumen de By María Beauty & Store"
           )
+          if os.environ["SEND_REPORT"].lower() != "true":
+              print("Read-only test: no email sent.")
+              sys.exit(0)
+          # Atomic date claim before sending. Never repeat an ambiguous send.
+          # Only date and commit SHA are stored; no statistics or recipient data.
+          try:
+              post_json(
+                  f"https://api.github.com/repos/{os.environ['GITHUB_REPOSITORY']}/git/refs",
+                  {"ref": f"refs/tags/maria-analytics-claimed/{yesterday}", "sha": os.environ["GITHUB_SHA"]},
+                  {"Authorization": f"Bearer {os.environ['GH_TOKEN']}", "Accept": "application/vnd.github+json"},
+              )
+          except urllib.error.HTTPError as error:
+              if error.code == 422:
+                  sys.exit("Date already claimed or ref invalid; no email sent. Check existing claim and Brevo.")
+              raise
           response = post_json(
               "https://api.brevo.com/v3/smtp/email",
               {
