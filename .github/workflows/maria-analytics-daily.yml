@@ -17,7 +17,14 @@ permissions:
   contents: read
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Test actual inline Python without credentials or network
+        run: python3 tests/test_maria_analytics.py
   send-daily:
+    needs: test
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     permissions:
       contents: write
